@@ -1,52 +1,71 @@
 'use client';
 
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { LayoutDashboard, FileSearch, Network, Boxes } from 'lucide-react';
-import { cn } from '@/lib/utils'; // Standard shadcn utility
-
-const NAV_ITEMS = [
-  { label: 'Dashboard', href: '/app/dashboard', icon: LayoutDashboard },
-  { label: 'AI Audit', href: '/app/audit', icon: FileSearch },
-  { label: 'Architecture', href: '/app/architecture', icon: Network },
-];
+import { useRouter, useSearchParams, usePathname } from 'next/navigation';
+import { FULL_AUDIT_REPORT } from '@/data/mock-data';
+import { cn } from '@/lib/utils';
+import { CheckCircle2, AlertTriangle, XCircle } from 'lucide-react';
 
 export function Sidebar({ className }: { className?: string }) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const pathname = usePathname();
 
+  // ONLY show this sidebar if we are on the /app/audit page
+  if (!pathname.includes('/app/audit')) {
+    return null;
+  }
+
+  // Get active module from URL
+  const activeModuleId = searchParams.get('module') || FULL_AUDIT_REPORT.modules[0].id;
+
+  const handleSelectModule = (id: string) => {
+    const params = new URLSearchParams(searchParams);
+    params.set('module', id);
+    router.push(`?${params.toString()}`);
+  };
+
   return (
-    <aside className={cn("flex flex-col h-full bg-slate-950 text-white border-r border-slate-800", className)}>
-      <div className="p-6 border-b border-slate-800">
-        <Link href="/" className="flex items-center gap-2 font-bold text-xl tracking-tight hover:opacity-80 transition-opacity">
-          <Boxes className="text-blue-500" />
-          <span>Kasparro<span className="text-blue-500">.ai</span></span>
-        </Link>
-      </div>
+    <aside className={cn("flex flex-col h-full bg-slate-50/50 dark:bg-slate-900/50 border-r border-border overflow-y-auto", className)}>
+      <div className="p-4">
+        <h3 className="text-xs font-semibold text-muted-foreground mb-4 uppercase tracking-wider">
+          Audit Modules
+        </h3>
+        <div className="flex flex-col space-y-1">
+          {FULL_AUDIT_REPORT.modules.map((module) => {
+            const isSelected = activeModuleId === module.id;
+            
+            let StatusIcon = CheckCircle2;
+            let colorClass = "text-green-500";
+            if (module.status === 'warning') { StatusIcon = AlertTriangle; colorClass = "text-yellow-500"; }
+            if (module.status === 'critical') { StatusIcon = XCircle; colorClass = "text-red-500"; }
 
-      <nav className="flex-1 p-4 space-y-2">
-        {NAV_ITEMS.map((item) => {
-          const isActive = pathname === item.href;
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                "flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors",
-                isActive 
-                  ? "bg-blue-600/10 text-blue-500" 
-                  : "text-slate-400 hover:bg-slate-900 hover:text-slate-200"
-              )}
-            >
-              <item.icon size={18} />
-              {item.label}
-            </Link>
-          );
-        })}
-      </nav>
-
-      <div className="p-4 border-t border-slate-800">
-        <div className="bg-slate-900 rounded-lg p-3">
-          <p className="text-xs text-slate-500 font-mono">V1.0.2 Stable</p>
+            return (
+              <button
+                key={module.id}
+                onClick={() => handleSelectModule(module.id)}
+                className={cn(
+                  "w-full flex items-center justify-between p-3 rounded-lg text-sm font-medium transition-all text-left",
+                  isSelected 
+                    ? "bg-white dark:bg-slate-800 shadow-sm border border-border text-foreground ring-1 ring-border" 
+                    : "text-muted-foreground hover:bg-slate-100 dark:hover:bg-slate-800/50"
+                )}
+              >
+                <span className="flex items-center gap-3">
+                  <StatusIcon className={cn("w-4 h-4", colorClass)} />
+                  <span className="truncate max-w-[120px]">{module.name}</span>
+                </span>
+                
+                <span className={cn(
+                  "text-[10px] px-1.5 py-0.5 rounded-full font-bold",
+                  module.score < 50 ? "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400" :
+                  module.score < 80 ? "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400" :
+                  "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
+                )}>
+                  {module.score}
+                </span>
+              </button>
+            );
+          })}
         </div>
       </div>
     </aside>

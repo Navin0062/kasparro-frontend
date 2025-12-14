@@ -11,7 +11,7 @@
 ---
 ## 🔗 Quick Links
 
-- **🚀 Live API Demo:** [https://kasparro-frontend.vercel.app/](https://kasparro-frontend.vercel.app/)
+- **🚀 Live :** [https://kasparro-frontend.vercel.app/](https://kasparro-frontend.vercel.app/)
 
 ---
 ## 📌 Project Overview

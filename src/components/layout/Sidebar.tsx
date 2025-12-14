@@ -5,13 +5,19 @@ import { FULL_AUDIT_REPORT } from '@/data/mock-data';
 import { cn } from '@/lib/utils';
 import { CheckCircle2, AlertTriangle, XCircle } from 'lucide-react';
 
-export function Sidebar({ className }: { className?: string }) {
+interface SidebarProps {
+  className?: string;
+  forceMount?: boolean;
+  onItemClick?: () => void;
+}
+
+export function Sidebar({ className, forceMount, onItemClick }: SidebarProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const pathname = usePathname();
 
-  // ONLY show this sidebar if we are on the /app/audit page
-  if (!pathname.includes('/app/audit')) {
+  // ONLY show this sidebar if we are on the /app/audit page, unless forced
+  if (!forceMount && !pathname.includes('/app/audit')) {
     return null;
   }
 
@@ -22,6 +28,11 @@ export function Sidebar({ className }: { className?: string }) {
     const params = new URLSearchParams(searchParams);
     params.set('module', id);
     router.push(`?${params.toString()}`);
+    
+    // Trigger callback if provided (e.g. to close mobile menu)
+    if (onItemClick) {
+      onItemClick();
+    }
   };
 
   return (

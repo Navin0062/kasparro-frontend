@@ -1,9 +1,10 @@
 'use client';
 
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
-import { FULL_AUDIT_REPORT } from '@/data/mock-data';
-import { cn } from '@/lib/utils';
-import { CheckCircle2, AlertTriangle, XCircle } from 'lucide-react';
+import { useAppStore } from '@/lib/store';
+import { AUDIT_REPORTS } from '@/data/mock-data';
+import { cn, getStatusColor } from '@/lib/utils';
+import { CheckCircle2, AlertTriangle, XCircle, Search } from 'lucide-react';
 
 interface SidebarProps {
   className?: string;
@@ -15,40 +16,46 @@ export function Sidebar({ className, forceMount, onItemClick }: SidebarProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const pathname = usePathname();
+  const { selectedBrand } = useAppStore();
 
-  // ONLY show this sidebar if we are on the /app/audit page, unless forced
+  // 1. Safety Guard: Only show on audit page (unless forced by mobile menu)
   if (!forceMount && !pathname.includes('/app/audit')) {
     return null;
   }
 
-  // Get active module from URL
-  const activeModuleId = searchParams.get('module') || FULL_AUDIT_REPORT.modules[0].id;
+  // 2. Get the correct report for the currently selected brand
+  const activeReport = AUDIT_REPORTS[selectedBrand.id] || AUDIT_REPORTS['b1'];
+
+  // 3. Get active module from URL (or default to the first one)
+  const activeModuleId = searchParams.get('module') || activeReport.modules[0]?.id;
 
   const handleSelectModule = (id: string) => {
     const params = new URLSearchParams(searchParams);
     params.set('module', id);
     router.push(`?${params.toString()}`);
     
-    // Trigger callback if provided (e.g. to close mobile menu)
+    // Close mobile menu if callback exists
     if (onItemClick) {
       onItemClick();
     }
   };
 
   return (
-    <aside className={cn("flex flex-col h-full bg-slate-50/50 dark:bg-slate-900/50 border-r border-border overflow-y-auto", className)}>
+    <aside className={cn("flex flex-col h-full bg-slate-50/50 dark:bg-slate-900/50 border-r border-slate-200 dark:border-white/5 overflow-y-auto", className)}>
       <div className="p-4">
-        <h3 className="text-xs font-semibold text-muted-foreground mb-4 uppercase tracking-wider">
+        <h3 className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-4 uppercase tracking-wider px-2">
           Audit Modules
         </h3>
+        
         <div className="flex flex-col space-y-1">
-          {FULL_AUDIT_REPORT.modules.map((module) => {
+          {activeReport.modules.map((module) => {
             const isSelected = activeModuleId === module.id;
             
+            // Resolve Icon based on status
             let StatusIcon = CheckCircle2;
-            let colorClass = "text-green-500";
-            if (module.status === 'warning') { StatusIcon = AlertTriangle; colorClass = "text-yellow-500"; }
-            if (module.status === 'critical') { StatusIcon = XCircle; colorClass = "text-red-500"; }
+            if (module.status === 'warning') StatusIcon = AlertTriangle;
+            if (module.status === 'critical') StatusIcon = XCircle;
+            if (module.status === 'pass') StatusIcon = CheckCircle2; // Explicit for clarity
 
             return (
               <button
@@ -57,20 +64,18 @@ export function Sidebar({ className, forceMount, onItemClick }: SidebarProps) {
                 className={cn(
                   "w-full flex items-center justify-between p-3 rounded-lg text-sm font-medium transition-all text-left",
                   isSelected 
-                    ? "bg-white dark:bg-slate-800 shadow-sm border border-border text-foreground ring-1 ring-border" 
-                    : "text-muted-foreground hover:bg-slate-100 dark:hover:bg-slate-800/50"
+                    ? "bg-white dark:bg-slate-800 shadow-sm border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white ring-1 ring-slate-200 dark:ring-white/5" 
+                    : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-slate-200"
                 )}
               >
                 <span className="flex items-center gap-3">
-                  <StatusIcon className={cn("w-4 h-4", colorClass)} />
-                  <span className="truncate max-w-[120px]">{module.name}</span>
+                  <StatusIcon className={cn("w-4 h-4", getStatusColor(module.status, 'text'))} />
+                  <span className="truncate max-w-[140px]">{module.name}</span>
                 </span>
                 
                 <span className={cn(
-                  "text-[10px] px-1.5 py-0.5 rounded-full font-bold",
-                  module.score < 50 ? "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400" :
-                  module.score < 80 ? "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400" :
-                  "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
+                  "text-[10px] px-1.5 py-0.5 rounded-full font-bold min-w-[24px] text-center",
+                  getStatusColor(module.status, 'bg')
                 )}>
                   {module.score}
                 </span>

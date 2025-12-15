@@ -1,16 +1,27 @@
 'use client';
 
+import { useEffect } from 'react';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { DashboardHeader } from '@/components/layout/DashboardHeader';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
+import { mockAuth } from '@/lib/mock-auth';
 
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const router = useRouter();
   const pathname = usePathname();
   const showSidebar = pathname.includes('/app/audit');
+
+  // --- FINAL POLISH: AUTH PROTECTION ---
+  useEffect(() => {
+    const session = mockAuth.getSession();
+    if (!session) {
+      router.replace('/login');
+    }
+  }, [router]);
 
   return (
     // 1. Updated base background to match Landing Page (Dark #030711 / White)
@@ -34,6 +45,15 @@ export default function DashboardLayout({
         <div className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 md:pt-8 pb-12">
           <div className="flex flex-col md:flex-row gap-8 h-full">
             
+            {showSidebar && (
+              <div className="hidden lg:block w-[300px] shrink-0">
+                <div className="sticky top-24">
+                  <div className="rounded-2xl border border-slate-200 dark:border-white/5 bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm overflow-hidden">
+                    <Sidebar />
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Main Content Area */}
             <main className="flex-1 min-w-0 animate-in fade-in duration-500">

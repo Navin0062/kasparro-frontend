@@ -1,11 +1,17 @@
 'use client';
 
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, Tooltip } from 'recharts';
-import { FULL_AUDIT_REPORT } from '@/data/mock-data';
+import { useAppStore } from '@/lib/store'; // 1. Import Store
+import { AUDIT_REPORTS } from '@/data/mock-data'; // 2. Import new dictionary
 
 export function ModuleRadarChart() {
-  // Format data for Recharts
-  const data = FULL_AUDIT_REPORT.modules.map(m => ({
+  const { selectedBrand } = useAppStore(); // 3. Get selected brand
+  
+  // 4. Get the correct report for the selected brand (fallback to 'b1' if missing)
+  const activeReport = AUDIT_REPORTS[selectedBrand.id] || AUDIT_REPORTS['b1'];
+
+  // Format data for Recharts using the ACTIVE report
+  const data = activeReport.modules.map(m => ({
     subject: m.name.replace(' ', '\n'), // Add line break for long names
     score: m.score,
     fullMark: 100,

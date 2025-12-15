@@ -1,7 +1,7 @@
 'use client';
 
 import { AuditModule } from '@/lib/types';
-import { cn } from '@/lib/utils';
+import { cn, getStatusColor } from '@/lib/utils'; // Import helper
 import { CheckCircle2, AlertTriangle, XCircle } from 'lucide-react';
 
 interface ModuleListProps {
@@ -22,9 +22,8 @@ export function ModuleList({ modules, selectedId, onSelect }: ModuleListProps) {
           
           // Determine Icon based on status
           let StatusIcon = CheckCircle2;
-          let colorClass = "text-green-500";
-          if (module.status === 'warning') { StatusIcon = AlertTriangle; colorClass = "text-yellow-500"; }
-          if (module.status === 'critical') { StatusIcon = XCircle; colorClass = "text-red-500"; }
+          if (module.status === 'warning') StatusIcon = AlertTriangle;
+          if (module.status === 'critical') StatusIcon = XCircle;
 
           return (
             <button
@@ -38,16 +37,15 @@ export function ModuleList({ modules, selectedId, onSelect }: ModuleListProps) {
               )}
             >
               <span className="flex items-center gap-3">
-                <StatusIcon className={cn("w-4 h-4", colorClass)} />
+                {/* Use 'text' variant for icon color */}
+                <StatusIcon className={cn("w-4 h-4", getStatusColor(module.status, 'text'))} />
                 {module.name}
               </span>
               
-              {/* Score Badge */}
+              {/* Use 'bg' variant for badge style */}
               <span className={cn(
                 "text-xs px-2 py-0.5 rounded-full font-bold",
-                module.score < 50 ? "bg-red-100 text-red-700" :
-                module.score < 80 ? "bg-yellow-100 text-yellow-700" :
-                "bg-green-100 text-green-700"
+                getStatusColor(module.status, 'bg')
               )}>
                 {module.score}
               </span>

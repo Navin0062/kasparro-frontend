@@ -2,6 +2,8 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Bot, Search, BarChart3, Sparkles, Zap, Layers } from 'lucide-react';
 import { Footer } from '@/components/layout/Footer';
+import { StatCard } from '@/components/features/landing/StatCard';
+import { FeatureCard } from '@/components/features/landing/FeatureCard';
 
 export default function HomePage() {
   return (
@@ -124,7 +126,7 @@ export default function HomePage() {
                   Start Free Audit
                </Button>
              </Link>
-             <Link href="/contact">
+             <Link href="#">
                <Button size="lg" variant="outline" className="h-12 px-8 text-lg rounded-full text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-white/5">
                   Contact Sales
                </Button>
@@ -140,58 +142,3 @@ export default function HomePage() {
 
 // --- HELPER COMPONENTS ---
 
-function StatCard({ icon: Icon, label, value, delay }: any) {
-  return (
-    <div 
-      className="p-4 rounded-xl bg-white dark:bg-[#111827]/50 backdrop-blur-md border border-slate-200 dark:border-white/10 flex items-center gap-3 hover:-translate-y-1 transition-transform duration-500 shadow-sm dark:shadow-none"
-      style={{ animationDelay: `${delay}ms` }}
-    >
-      <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-white/5 flex items-center justify-center border border-slate-200 dark:border-white/10">
-        <Icon className="w-5 h-5 text-slate-600 dark:text-slate-200" />
-      </div>
-      <div className="text-left">
-        <div className="text-xl font-bold text-slate-900 dark:text-white tracking-tight">{value}</div>
-        <div className="text-[10px] font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">{label}</div>
-      </div>
-    </div>
-  )
-}
-
-function FeatureCard({ icon: Icon, title, desc, color }: any) {
-  const iconColors = {
-    blue: "text-blue-600 dark:text-blue-400",
-    purple: "text-purple-600 dark:text-purple-400",
-    emerald: "text-emerald-600 dark:text-emerald-400",
-  }
-
-  const gradients = {
-    blue: "from-blue-500/20 to-transparent",
-    purple: "from-purple-500/20 to-transparent",
-    emerald: "from-emerald-500/20 to-transparent",
-  }
-
-  const lightHoverStyles = {
-    blue: "hover:border-blue-500/50 hover:shadow-blue-100/50",
-    purple: "hover:border-purple-500/50 hover:shadow-purple-100/50",
-    emerald: "hover:border-emerald-500/50 hover:shadow-emerald-100/50",
-  }
-
-  return (
-    <div className={`group relative p-8 rounded-3xl bg-white dark:bg-[#0A0F1C] border border-slate-200 dark:border-white/10 overflow-hidden ${lightHoverStyles[color as keyof typeof lightHoverStyles]} dark:hover:border-white/20 transition-all duration-300 shadow-sm hover:shadow-xl dark:hover:shadow-blue-900/10`}>
-      
-      {/* Hover Gradient Effect (Dark Mode Only) */}
-      <div className={`hidden dark:block absolute inset-0 bg-gradient-to-br ${gradients[color as keyof typeof gradients]} opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none`} />
-      
-      <div className="relative z-10">
-        <div className="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-          <Icon className={`w-6 h-6 ${iconColors[color as keyof typeof iconColors]}`} />
-        </div>
-        
-        <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-3">{title}</h3>
-        <p className="text-slate-600 dark:text-slate-400 leading-relaxed text-sm font-light">
-          {desc}
-        </p>
-      </div>
-    </div>
-  )
-}

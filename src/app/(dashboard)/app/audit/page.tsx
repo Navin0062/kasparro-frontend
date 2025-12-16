@@ -7,19 +7,14 @@ import { AUDIT_REPORTS } from '@/data/mock-data';
 import { ModuleDetail } from '@/components/features/audit/ModuleDetail';
 import { MousePointerClick, Loader2 } from 'lucide-react';
 
-// 1. ISOLATED COMPONENT: Handles the logic that needs URL parameters
 function AuditContent() {
   const { selectedBrand } = useAppStore();
   const searchParams = useSearchParams(); 
   const moduleId = searchParams.get('module');
 
-  // Get the correct report for the selected Brand
   const activeReport = AUDIT_REPORTS[selectedBrand.id] || AUDIT_REPORTS['b1'];
-
-  // Find the active module inside that report
   const activeModule = activeReport.modules.find((m) => m.id === moduleId);
 
-  // --- EMPTY STATE (No Module Selected) ---
   if (!activeModule) {
     return (
       <div className="h-full flex flex-col items-center justify-center min-h-[50vh] text-center space-y-6 animate-in fade-in duration-500">
@@ -37,7 +32,6 @@ function AuditContent() {
     );
   }
 
-  // --- DETAIL VIEW ---
   return (
     <div className="space-y-6">
       <ModuleDetail module={activeModule} />
@@ -45,9 +39,9 @@ function AuditContent() {
   );
 }
 
-// 2. MAIN PAGE COMPONENT: Wraps the content in Suspense
 export default function AuditPage() {
   return (
+    // The Suspense boundary MUST be around the component using useSearchParams
     <Suspense fallback={
       <div className="flex h-[50vh] items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-slate-400" />

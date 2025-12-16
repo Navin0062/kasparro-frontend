@@ -7,10 +7,10 @@ import { AUDIT_REPORTS } from '@/data/mock-data';
 import { ModuleDetail } from '@/components/features/audit/ModuleDetail';
 import { MousePointerClick, Loader2 } from 'lucide-react';
 
-// 1. Create a sub-component for the logic that needs search params
+// 1. ISOLATED COMPONENT: Handles the logic that needs URL parameters
 function AuditContent() {
   const { selectedBrand } = useAppStore();
-  const searchParams = useSearchParams(); // This is what caused the error
+  const searchParams = useSearchParams(); 
   const moduleId = searchParams.get('module');
 
   // Get the correct report for the selected Brand
@@ -45,7 +45,7 @@ function AuditContent() {
   );
 }
 
-// 2. Export the main Page component wrapped in Suspense
+// 2. MAIN PAGE COMPONENT: Wraps the content in Suspense
 export default function AuditPage() {
   return (
     <Suspense fallback={

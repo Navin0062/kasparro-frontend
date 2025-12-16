@@ -1,21 +1,22 @@
 'use client';
 
+import { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { useAppStore } from '@/lib/store'; // 1. Import Store
-import { AUDIT_REPORTS } from '@/data/mock-data'; // 2. Import Dictionary
+import { useAppStore } from '@/lib/store'; 
+import { AUDIT_REPORTS } from '@/data/mock-data'; 
 import { ModuleDetail } from '@/components/features/audit/ModuleDetail';
-import { MousePointerClick } from 'lucide-react';
+import { MousePointerClick, Loader2 } from 'lucide-react';
 
-export default function AuditPage() {
-  // 3. Get Brand and URL Params
+// 1. Create a sub-component for the logic that needs search params
+function AuditContent() {
   const { selectedBrand } = useAppStore();
-  const searchParams = useSearchParams();
+  const searchParams = useSearchParams(); // This is what caused the error
   const moduleId = searchParams.get('module');
 
-  // 4. Get the correct report for the selected Brand
+  // Get the correct report for the selected Brand
   const activeReport = AUDIT_REPORTS[selectedBrand.id] || AUDIT_REPORTS['b1'];
 
-  // 5. Find the active module inside that report
+  // Find the active module inside that report
   const activeModule = activeReport.modules.find((m) => m.id === moduleId);
 
   // --- EMPTY STATE (No Module Selected) ---
@@ -41,5 +42,18 @@ export default function AuditPage() {
     <div className="space-y-6">
       <ModuleDetail module={activeModule} />
     </div>
+  );
+}
+
+// 2. Export the main Page component wrapped in Suspense
+export default function AuditPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex h-[50vh] items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-slate-400" />
+      </div>
+    }>
+      <AuditContent />
+    </Suspense>
   );
 }

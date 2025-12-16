@@ -67,9 +67,9 @@ export default function HomePage() {
 
           {/* Floating Stats */}
           <div className="mt-20 grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl mx-auto perspective-1000 animate-in fade-in slide-in-from-bottom-8">
-             <StatCard icon={Zap} label="Processing Speed" value="140ms" delay="0" />
-             <StatCard icon={Layers} label="Vector Dimensions" value="1,536" delay="100" />
-             <StatCard icon={Bot} label="Models Tracked" value="12+" delay="200" />
+             <StatCard icon={Zap} label="Processing Speed" value="140ms" delay={0} />
+             <StatCard icon={Layers} label="Vector Dimensions" value="1,536" delay={0} />
+             <StatCard icon={Bot} label="Models Tracked" value="12+" delay={0} />
           </div>
         </div>
       </section>
